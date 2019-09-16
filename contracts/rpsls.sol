@@ -13,8 +13,8 @@ contract rock_papers_scissors_lizard_spock
     uint256 private myEtherValue = 1 ether;
     uint private cntrl;
     
-    constructor (uint256 betAmount, bool randomAgent) public {
-        _betAmount = betAmount * myEtherValue;
+    constructor () public {
+        // _betAmount = betAmount * myEtherValue;
         owner = msg.sender;
         playerOne = address(0);
         playerTwo = address(0);
@@ -22,7 +22,7 @@ contract rock_papers_scissors_lizard_spock
         cntrl = 0;
     }
     function bet(uint current_choice) payable public {
-        require(msg.value == _betAmount &&  current_choice < 6 && (playerOne == address(0) || playerTwo == address(0) || playerOne == msg.sender || playerTwo == msg.sender) && (games_won[playerOne] + games_won[playerTwo] < 10));
+        require(msg.value > 0 && current_choice < 6 && (playerOne == address(0) || playerTwo == address(0) || playerOne == msg.sender || playerTwo == msg.sender) && (games_won[playerOne] + games_won[playerTwo] < 1));
         if(playerOne == address(0))
         {
             playerOne = msg.sender;
@@ -41,8 +41,8 @@ contract rock_papers_scissors_lizard_spock
         {
             revert();
         }
-        choice[msg.sender] = current_choice;
-        cashPrice += _betAmount;
+        choice[msg.sender] = current_choice;    
+        cashPrice += msg.value;
         if(cntrl % 2 == 1)
         {
             if(choice[playerOne] == choice[playerTwo])
@@ -108,9 +108,16 @@ contract rock_papers_scissors_lizard_spock
         cntrl++;
     }
     
+    function reset() private {
+        playerOne = address(0);
+        playerTwo = address(0);
+        cashPrice = 0;
+        cntrl = 0;
+    }
+    
     
     function cashIn() public {
-        require(games_won[playerOne] + games_won[playerTwo] == 10);
+        require(games_won[playerOne] + games_won[playerTwo] == 1);
         address payable winner = address(0);
         if(games_won[playerOne] == games_won[playerTwo])
         {
@@ -125,6 +132,7 @@ contract rock_papers_scissors_lizard_spock
             winner = playerTwo;
         }
         winner.transfer(cashPrice);
+        reset();
     }
     
 }
