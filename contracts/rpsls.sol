@@ -1,6 +1,6 @@
 pragma solidity >=0.4.22 <0.6.0;
 
-contract rock_papers_scissors_lizard_spock
+contract Rpsls
 {
     mapping (address => uint) private choice;
     mapping (address => uint) private games_won;
