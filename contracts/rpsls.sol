@@ -41,7 +41,7 @@ contract rock_papers_scissors_lizard_spock
         {
             revert();
         }
-        choice[msg.sender] = current_choice;    
+        choice[msg.sender] = current_choice;
         cashPrice += _betAmount;
         if(cntrl % 2 == 1)
         {
