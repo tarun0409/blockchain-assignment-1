@@ -22,7 +22,7 @@ contract Rpsls
         cntrl = 0;
     }
     function bet(uint current_choice) payable public {
-        require(msg.value > 0 && current_choice < 6 && (playerOne == address(0) || playerTwo == address(0) || playerOne == msg.sender || playerTwo == msg.sender) && (games_won[playerOne] + games_won[playerTwo] < 1));
+        require(msg.value > 0 && current_choice > 0 && current_choice < 6 && (playerOne == address(0) || playerTwo == address(0) || playerOne == msg.sender || playerTwo == msg.sender) && (games_won[playerOne] + games_won[playerTwo] < 1));
         if(playerOne == address(0))
         {
             playerOne = msg.sender;
