@@ -12,6 +12,7 @@ contract Rpsls
     address payable nextPlayer;
     uint256 private myEtherValue = 1 ether;
     uint private cntrl;
+    bool allPlayersRegistered;
     
     constructor () public {
         // _betAmount = betAmount * myEtherValue;
@@ -20,15 +21,44 @@ contract Rpsls
         playerTwo = address(0);
         cashPrice = 0;
         cntrl = 0;
+        allPlayersRegistered = false;
     }
-    function bet(uint current_choice) payable public {
-        require(msg.value > 0 && current_choice > 0 && current_choice < 6 && (playerOne == address(0) || playerTwo == address(0) || playerOne == msg.sender || playerTwo == msg.sender) && (games_won[playerOne] + games_won[playerTwo] < 10));
+    function registerUser() public {
+        require(playerOne == address(0) || playerTwo == address(0));
+        if(playerOne != address(0) && playerOne == msg.sender)
+        {
+            revert();
+        }
+        if(playerTwo != address(0) && playerTwo == msg.sender)
+        {
+            revert();
+        }
+        if(playerOne != address(0) && playerTwo != address(0))
+        {
+            revert();
+        }
+        bool justRegisteredPlayerOne = false;
         if(playerOne == address(0))
         {
             playerOne = msg.sender;
             games_won[playerOne] = 0;
+            justRegisteredPlayerOne = true;
         }
-        else if(msg.sender != playerOne && playerTwo == address(0))
+        if(!justRegisteredPlayerOne && playerTwo == address(0))
+        {
+            playerTwo = msg.sender;
+            games_won[playerTwo] = 0;
+            allPlayersRegistered = true;
+        }
+    }
+    function bet(uint current_choice) payable public {
+        require(msg.value > 0 && current_choice > 0 && current_choice < 6 && (playerOne == address(0) || playerTwo == address(0) || playerOne == msg.sender || playerTwo == msg.sender) && (games_won[playerOne] + games_won[playerTwo] < 10));
+        if(playerOne == address(0) && allPlayersRegistered)
+        {
+            playerOne = msg.sender;
+            games_won[playerOne] = 0;
+        }
+        else if(msg.sender != playerOne && playerTwo == address(0) && allPlayersRegistered)
         {
             playerTwo = msg.sender;
             games_won[playerTwo] = 0;
