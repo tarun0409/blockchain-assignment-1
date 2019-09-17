@@ -643,6 +643,11 @@ contract('RPSLS ::: Test 18',function(accounts){
                 await instance.reveal("hello",{from:accounts[1]});
 
                 await instance.cashIn();
+
+                await instance.reset(true);
+                await instance.registerUser({from:accounts[1]});
+                await instance.bet(playerOneChoiceTwo,{from:accounts[1],value:2});
+                await instance.bet(playerOneChoiceThree,{from:accounts[1],value:2});
             }
             catch(e)
             {
@@ -654,6 +659,40 @@ contract('RPSLS ::: Test 18',function(accounts){
     });
 });
 contract('RPSLS ::: Test 19',function(accounts){
+    it("random agent Case of reverting if cashIn is called before playing 10 players",function(){
+        return Rpsls.deployed().then(async function(instance)
+        {
+            await instance.reset(true);
+            await instance.registerUser({from:accounts[1]});
+            var exceptionOccurred = false;
+            try
+            {
+                await instance.bet(playerOneChoiceTwo,{from:accounts[1],value:2});
+                await instance.bet(playerOneChoiceThree,{from:accounts[1],value:2});
+                await instance.bet(playerOneChoiceOne,{from:accounts[1],value:2});
+                await instance.bet(playerOneChoiceFour,{from:accounts[1],value:2});
+                await instance.bet(playerOneChoiceThree,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceOne,{from:accounts[1],value:2});
+                await instance.bet(playerOneChoiceFour,{from:accounts[1],value:2});
+                await instance.bet(playerOneChoiceThree,{from:accounts[1],value:2});
+
+                await instance.reveal("hello",{from:accounts[1]});
+
+                await instance.cashIn();
+            }
+            catch(e)
+            {
+                exceptionOccurred = true;
+                assert(e.message.includes("10 games have to be played"),'Expected revert!');
+            }
+            assert(exceptionOccurred,'Exception should not have been thrown');
+            
+        });
+    });
+});
+
+contract('RPSLS ::: Test 20',function(accounts){
     it("should revert if 2 players trys to register if random agent is selected",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -676,7 +715,7 @@ contract('RPSLS ::: Test 19',function(accounts){
     });
 });
 
-contract('RPSLS ::: Test 20-21',function(accounts){
+contract('RPSLS ::: Test 21-22',function(accounts){
     it("should be able to recharge contract balance",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -715,7 +754,7 @@ contract('RPSLS ::: Test 20-21',function(accounts){
     });
 });
 
-contract('RPSLS ::: Test 22',function(accounts){
+contract('RPSLS ::: Test 23',function(accounts){
     it("should not be able to cashIn after it has already been called",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -765,7 +804,7 @@ contract('RPSLS ::: Test 22',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned"),'Expected revert!');
+                assert(e.message.includes("One or all players have not revealed nonce"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -773,7 +812,7 @@ contract('RPSLS ::: Test 22',function(accounts){
     });
 });
 
-contract('RPSLS ::: Test 23',function(accounts){
+contract('RPSLS ::: Test 24',function(accounts){
     it("should revert if reveal is done before game",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -817,7 +856,7 @@ contract('RPSLS ::: Test 23',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("One or all players have not revealed nonce"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -825,7 +864,7 @@ contract('RPSLS ::: Test 23',function(accounts){
     });
 });
 
-contract('RPSLS ::: Test 24',function(accounts){
+contract('RPSLS ::: Test 25',function(accounts){
     it("should revert if cashin is done before reveal",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -842,7 +881,7 @@ contract('RPSLS ::: Test 24',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("10 games have to be played"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -851,7 +890,7 @@ contract('RPSLS ::: Test 24',function(accounts){
 });
 
 
-contract('RPSLS ::: Test 25',function(accounts){
+contract('RPSLS ::: Test 26',function(accounts){
     it("should revert if revealed nonce is incorrect",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -898,7 +937,7 @@ contract('RPSLS ::: Test 25',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("Invalid choice by the user"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
