@@ -772,3 +772,136 @@ contract('RPSLS ::: Test 22',function(accounts){
         });
     });
 });
+
+contract('RPSLS ::: Test 23',function(accounts){
+    it("should revert if reveal is done before game",function(){
+        return Rpsls.deployed().then(async function(instance)
+        {
+            var exceptionOccurred = false;
+            await instance.registerUser({from: accounts[0]});
+            await instance.registerUser({from: accounts[1]});
+            try
+            {
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceThree,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceOne,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFour,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceOne,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceFour,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceOne,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFive,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceThree,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceFive,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFive,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceOne,{from:accounts[1],value:2});
+
+                await instance.cashIn();
+            }
+            catch(e)
+            {
+                exceptionOccurred = true;
+                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+            }
+            assert(exceptionOccurred,'Exception should have been thrown');
+            
+        });
+    });
+});
+
+contract('RPSLS ::: Test 24',function(accounts){
+    it("should revert if cashin is done before reveal",function(){
+        return Rpsls.deployed().then(async function(instance)
+        {
+            var exceptionOccurred = false;
+            await instance.registerUser({from: accounts[0]});
+            await instance.registerUser({from: accounts[1]});
+            try
+            {
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerOneChoiceThree,{from:accounts[1],value:2});
+                await instance.reveal("hello",{from:accounts[0]});
+                await instance.reveal("hi",{from:accounts[1]});
+            }
+            catch(e)
+            {
+                exceptionOccurred = true;
+                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+            }
+            assert(exceptionOccurred,'Exception should have been thrown');
+            
+        });
+    });
+});
+
+
+contract('RPSLS ::: Test 25',function(accounts){
+    it("should revert if revealed nonce is incorrect",function(){
+        return Rpsls.deployed().then(async function(instance)
+        {
+            await instance.registerUser({from:accounts[0]});
+            await instance.registerUser({from:accounts[1]});
+            var exceptionOccurred = false;
+            try
+            {
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceThree,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceOne,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFour,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceOne,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceFour,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceOne,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFive,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceThree,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceFive,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFive,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceOne,{from:accounts[1],value:2});
+
+                await instance.reveal("xyz",{from:accounts[0]});
+                await instance.reveal("hi",{from:accounts[1]});
+
+                await instance.cashIn();
+            }
+            catch(e)
+            {
+                exceptionOccurred = true;
+                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+            }
+            assert(exceptionOccurred,'Exception should have been thrown');
+            
+        });
+    });
+});
