@@ -610,7 +610,7 @@ contract('RPSLS ::: Test 16-17',function(accounts){
     });
 });
 contract('RPSLS ::: Test 18',function(accounts){
-    it("should revert if another player trys to register if random agent is selected",function(){
+    it("should revert if 2 players trys to register if random agent is selected",function(){
         return Rpsls.deployed().then(async function(instance)
         {
             await instance.reset(true);
@@ -633,7 +633,7 @@ contract('RPSLS ::: Test 18',function(accounts){
     });
 });
 
-contract('RPSLS ::: Test 20',function(accounts){
+contract('RPSLS ::: Test 19-20',function(accounts){
     it("should be able to recharge contract balance",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -650,6 +650,24 @@ contract('RPSLS ::: Test 20',function(accounts){
                 assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
             }
             assert(!exceptionOccurred,'Exception should not have been thrown');
+            
+        });
+    });
+
+    it("should revert if recharge is not attempted by owner",function(){
+        return Rpsls.deployed().then(async function(instance)
+        {
+            var exceptionOccurred = false;
+            try
+            {
+                await instance.recharge({from:accounts[1], value: 5});
+            }
+            catch(e)
+            {
+                exceptionOccurred = true;
+                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+            }
+            assert(exceptionOccurred,'Exception should have been thrown');
             
         });
     });

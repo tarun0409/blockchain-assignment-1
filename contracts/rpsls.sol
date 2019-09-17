@@ -18,7 +18,7 @@ contract Rpsls
     uint public cntrl;
     //bool allPlayersRegistered;
     bool private _randomAgent;
-    uint256 private contract_amt;
+    // uint256 private contract_amt;
     // playerOneReveal;
     //bool playerTwoReveal;
     bool playerOneRevealed;
@@ -348,9 +348,9 @@ contract Rpsls
         reset(false);
     }
     
-    function recharge() payable public {
-        require(msg.value > 0);
-        contract_amt += msg.value;
+    function recharge() public payable {
+        require(msg.value > 0 && msg.sender == owner, 'Exception in recharge');
+        cashPrice += msg.value;
     }
     
 }
