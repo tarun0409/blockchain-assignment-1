@@ -9,77 +9,107 @@ contract Rpsls
     mapping (address => uint) private games_won;
     address payable private playerOne;
     address payable private playerTwo;
-    uint256 private _betAmount;
-    uint256 private cashPrice;
+    //uint256 private _betAmount;
+    
     address payable private owner;
+    uint256 private cashPrice;
     address payable nextPlayer;
-    uint256 private myEtherValue = 1 ether;
-    uint private cntrl;
+    //uint256 private myEtherValue = 1 ether;
+    uint public cntrl;
     //bool allPlayersRegistered;
     bool private _randomAgent;
     uint256 private contract_amt;
-    bool playerOneReveal;
-    bool playerTwoReveal;
+    // playerOneReveal;
+    //bool playerTwoReveal;
     bool playerOneRevealed;
     bool playerTwoRevealed;
+    bool playerOneRegistered;
+    bool playerTwoRegistered;
     string playerOneNonce;
     string playerTwoNonce;
     
     constructor (bool randomAgent) payable public {
-        // _betAmount = betAmount * myEtherValue;
-        require(!randomAgent || (randomAgent && msg.value>0));
         owner = msg.sender;
-        //contract_amt = msg.value;
         playerOne = address(0);
         playerTwo = address(0);
         cashPrice = msg.value;
         cntrl = 0;
-        //allPlayersRegistered = false;
         _randomAgent = randomAgent;
-        if(randomAgent) {
-            playerTwo = owner;
-        }
-        playerOneReveal = false;
-        playerTwoReveal = false;
+        // if(randomAgent) {
+        //     playerTwo = owner;
+        // }
+        // playerOneReveal = false;
+        // playerTwoReveal = false;
         playerOneRevealed = false;
         playerTwoRevealed = false;
+        playerOneRegistered = false;
+        playerTwoRegistered = false;
     }
     function registerUser() public {
-        require(playerOne == address(0) || playerTwo == address(0));
-        if(playerOne != address(0) && playerOne == msg.sender)
+        require(!playerOneRegistered || !playerTwoRegistered,'Both players have registered');
+        if(playerOneRegistered && msg.sender == playerOne)
         {
-            revert('reg1');
+            revert('Player has already registered');
         }
-        if(playerTwo != address(0) && playerTwo == msg.sender)
+        if(playerTwoRegistered && msg.sender == playerTwo)
         {
-            revert('reg2');
-        }
-        if(playerOne != address(0) && playerTwo != address(0))
-        {
-            revert('reg3');
+            revert('Player has already registered');
         }
         bool justRegisteredPlayerOne = false;
-        if(playerOne == address(0))
+        if(!playerOneRegistered)
         {
             playerOne = msg.sender;
-            games_won[playerOne] = 0;
+            playerOneRegistered = true;
             justRegisteredPlayerOne = true;
-            
+            games_won[playerOne] = 0;
             if(_randomAgent)
             {
                 playerTwo = owner;
+                playerTwoRegistered = true;
                 games_won[playerTwo] = 0;
-                //allPlayersRegistered = true;
             }
         }
-        if(!justRegisteredPlayerOne && playerTwo == address(0))
+        if(!justRegisteredPlayerOne && !playerTwoRegistered)
         {
             playerTwo = msg.sender;
+            playerTwoRegistered = true;
             games_won[playerTwo] = 0;
-            //allPlayersRegistered = true;
         }
+        // if(playerOne != address(0) && playerOne == msg.sender)
+        // {
+        //     revert('reg1');
+        // }
+        // if(playerTwo != address(0) && playerTwo == msg.sender)
+        // {
+        //     revert('reg2');
+        // }
+        // if(playerOne != address(0) && playerTwo != address(0))
+        // {
+        //     revert('reg3');
+        // }
+        // bool justRegisteredPlayerOne = false;
+        // if(playerOne == address(0))
+        // {
+        //     playerOne = msg.sender;
+        //     games_won[playerOne] = 0;
+        //     justRegisteredPlayerOne = true;
+            
+        //     if(_randomAgent)
+        //     {
+        //         playerTwo = owner;
+        //         games_won[playerTwo] = 0;
+        //         //allPlayersRegistered = true;
+        //     }
+        // }
+        // if(!justRegisteredPlayerOne && playerTwo == address(0))
+        // {
+        //     playerTwo = msg.sender;
+        //     games_won[playerTwo] = 0;
+        //     //allPlayersRegistered = true;
+        // }
     }
     
+
     function random() private view returns(uint){
         return uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%6) + 1;
     }
@@ -143,6 +173,8 @@ contract Rpsls
         cashPrice = 0;
         cntrl = 0;
         _randomAgent = randomAgent;
+        playerOneRegistered = false;
+        playerTwoRegistered = false;
         //allPlayersRegistered = false;
     }
     
