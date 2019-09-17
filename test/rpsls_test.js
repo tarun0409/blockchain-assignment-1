@@ -24,9 +24,8 @@ contract('RPSLS ::: Test 1',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
             }
-            assert(!exceptionOccurred,'Exception should have been thrown');
+            assert(!exceptionOccurred,'Exception should not have been thrown');
             
         });
     });
@@ -36,16 +35,15 @@ contract('RPSLS ::: Test 2',function(accounts){
         return Rpsls.deployed().then(async function(instance)
         {
             await instance.registerUser({from:accounts[0]});
-            await instance.registerUser({from:accounts[1]});
             var exceptionOccurred = false;
             try
             {
-                await instance.registerUser({from:accounts[1]});
+                await instance.registerUser({from:accounts[0]});
             }
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("Player has already registered"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -65,7 +63,7 @@ contract('RPSLS ::: Test 3',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("One or more players not registered"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -86,7 +84,7 @@ contract('RPSLS ::: Test 4',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("Both players have registered"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -108,7 +106,7 @@ contract('RPSLS ::: Tests 5-8',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("Player should send money to contract."),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -127,7 +125,6 @@ contract('RPSLS ::: Tests 5-8',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Transaction should not be reverted!');
             }
             assert(!exceptionOccurred,'Exception should not have been thrown');
             
@@ -147,7 +144,7 @@ contract('RPSLS ::: Tests 5-8',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("Player one is not caller"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -159,9 +156,9 @@ contract('RPSLS ::: Tests 5-8',function(accounts){
             var exceptionOccurred = false;
             try
             {
-                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
-                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
-                await instance.bet(playerTwoChoiceOne,{from:accounts[1],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerOneChoiceThree,{from:accounts[1],value:2});
+                await instance.bet(playerTwoChoiceOne,{from:accounts[0],value:2});
                 await instance.reveal("hello",{from:accounts[0]});
                 await instance.reveal("hi",{from:accounts[1]});
                 await instance.cashIn();
@@ -169,7 +166,7 @@ contract('RPSLS ::: Tests 5-8',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("10 games have to be played"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -194,7 +191,6 @@ contract('RPSLS ::: Test 9',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Transaction should not be reverted!');
             }
             assert(!exceptionOccurred,'Exception should not have been thrown');
             
@@ -245,7 +241,6 @@ contract('RPSLS ::: Test 10',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
             }
             assert(!exceptionOccurred,'Exception should have been thrown');
             
@@ -302,7 +297,6 @@ contract('RPSLS ::: Test 11',function(accounts){
             {
                 console.log(e.message)
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
             }
             assert(!exceptionOccurred,'Exception should not have been thrown');
             
@@ -420,7 +414,6 @@ contract('RPSLS ::: Test 13',function(accounts){
             {
                 console.log(e.message);
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
             }
             assert(!exceptionOccurred,'Exception should not have been thrown');
             
@@ -483,7 +476,7 @@ contract('RPSLS ::: Test 14',function(accounts){
 
 
 contract('RPSLS ::: Test 15',function(accounts){
-    it("revert when choice is invalid",function(){
+    it("revert when choice is greater than 5",function(){
         return Rpsls.deployed().then(async function(instance)
         {
             await instance.registerUser({from:accounts[0]});
@@ -530,14 +523,69 @@ contract('RPSLS ::: Test 15',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("Invalid choice by the user"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
         });
     });
 });
-contract('RPSLS ::: Test 16-17',function(accounts){
+contract('RPSLS ::: Test 16',function(accounts){
+    it("revert when choice is lesser than 1",function(){
+        return Rpsls.deployed().then(async function(instance)
+        {
+            await instance.registerUser({from:accounts[0]});
+            await instance.registerUser({from:accounts[1]});
+            var exceptionOccurred = false;
+            try
+            {
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceThree,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceOne,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFour,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceOne,{from:accounts[1],value:2});
+
+                await instance.bet(invalidChoiceTwo,{from:accounts[0],value:2}); //invalid choice
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceOne,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFive,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceThree,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceFive,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFive,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceOne,{from:accounts[1],value:2});
+
+                await instance.reveal("hello",{from:accounts[0]});
+                await instance.reveal("hi",{from:accounts[1]});
+
+                await instance.cashIn();
+
+            }
+            catch(e)
+            {
+                exceptionOccurred = true;
+                assert(e.message.includes("Invalid choice by the user"),'Expected revert!');
+            }
+            assert(exceptionOccurred,'Exception should have been thrown');
+            
+        });
+    });
+});
+contract('RPSLS ::: Test 17',function(accounts){
     it("should be able to play against the random agent",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -564,15 +612,14 @@ contract('RPSLS ::: Test 16-17',function(accounts){
             }
             catch(e)
             {
-                console.log(e.message);
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
             }
             assert(!exceptionOccurred,'Exception should not have been thrown');
             
         });
     });
-
+});
+contract('RPSLS ::: Test 18',function(accounts){
     it("should be able to play random agent after reset",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -593,23 +640,20 @@ contract('RPSLS ::: Test 16-17',function(accounts){
                 await instance.bet(playerOneChoiceFour,{from:accounts[1],value:2});
                 await instance.bet(playerOneChoiceThree,{from:accounts[1],value:2});
 
-                await instance.cashIn();
+                await instance.reveal("hello",{from:accounts[1]});
 
-                await instance.reset(true);
-                await instance.registerUser({from:accounts[1]});
-                await instance.bet(playerOneChoiceTwo,{from:accounts[1],value:2});
+                await instance.cashIn();
             }
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
             }
             assert(!exceptionOccurred,'Exception should not have been thrown');
             
         });
     });
 });
-contract('RPSLS ::: Test 18',function(accounts){
+contract('RPSLS ::: Test 19',function(accounts){
     it("should revert if 2 players trys to register if random agent is selected",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -623,9 +667,8 @@ contract('RPSLS ::: Test 18',function(accounts){
             }
             catch(e)
             {
-                //console.log(e.message);
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("Both players have registered"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
@@ -633,7 +676,7 @@ contract('RPSLS ::: Test 18',function(accounts){
     });
 });
 
-contract('RPSLS ::: Test 19-20',function(accounts){
+contract('RPSLS ::: Test 20-21',function(accounts){
     it("should be able to recharge contract balance",function(){
         return Rpsls.deployed().then(async function(instance)
         {
@@ -647,7 +690,6 @@ contract('RPSLS ::: Test 19-20',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
             }
             assert(!exceptionOccurred,'Exception should not have been thrown');
             
@@ -665,7 +707,65 @@ contract('RPSLS ::: Test 19-20',function(accounts){
             catch(e)
             {
                 exceptionOccurred = true;
-                assert(e.message.startsWith("Returned error: VM Exception"),'Expected revert!');
+                assert(e.message.includes("Only owner of contract can call recharge"),'Expected revert!');
+            }
+            assert(exceptionOccurred,'Exception should have been thrown');
+            
+        });
+    });
+});
+
+contract('RPSLS ::: Test 22',function(accounts){
+    it("should not be able to cashIn after it has already been called",function(){
+        return Rpsls.deployed().then(async function(instance)
+        {
+            await instance.registerUser({from:accounts[0]});
+            await instance.registerUser({from:accounts[1]});
+            
+            var exceptionOccurred = false;
+            try
+            {
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceThree,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceFour,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceOne,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceOne,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceFour,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceOne,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFive,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceThree,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceThree,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceFive,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceTwo,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceFive,{from:accounts[1],value:2});
+
+                await instance.bet(playerOneChoiceOne,{from:accounts[0],value:2});
+                await instance.bet(playerTwoChoiceTwo,{from:accounts[1],value:2});
+
+                await instance.reveal("hello",{from:accounts[0]});
+                await instance.reveal("hi",{from:accounts[1]});
+
+                await instance.cashIn();
+                await instance.cashIn();
+
+            }
+            catch(e)
+            {
+                exceptionOccurred = true;
+                assert(e.message.startsWith("Returned"),'Expected revert!');
             }
             assert(exceptionOccurred,'Exception should have been thrown');
             
