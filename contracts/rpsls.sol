@@ -35,15 +35,15 @@ contract Rpsls
         require(playerOne == address(0) || playerTwo == address(0));
         if(playerOne != address(0) && playerOne == msg.sender)
         {
-            revert();
+            revert('reg1');
         }
         if(playerTwo != address(0) && playerTwo == msg.sender)
         {
-            revert();
+            revert('reg2');
         }
         if(playerOne != address(0) && playerTwo != address(0))
         {
-            revert();
+            revert('reg3');
         }
         bool justRegisteredPlayerOne = false;
         if(playerOne == address(0))
@@ -72,7 +72,7 @@ contract Rpsls
     }
     
     function bet(uint current_choice) payable public {
-        require(msg.value > 0 && current_choice > 0 && current_choice < 6 && (playerOne == address(0) || playerTwo == address(0) || playerOne == msg.sender || playerTwo == msg.sender) && (games_won[playerOne] + games_won[playerTwo] < 1));
+        require(msg.value > 0 && current_choice > 0 && current_choice < 6 && (playerOne == address(0) || playerTwo == address(0) || playerOne == msg.sender || playerTwo == msg.sender) && (games_won[playerOne] + games_won[playerTwo] < 10), 'Exception in bet');
         // if(playerOne == address(0) && allPlayersRegistered)
         // {
         //     playerOne = msg.sender;
@@ -85,11 +85,11 @@ contract Rpsls
         // }
         if(cntrl % 2 == 0 && msg.sender != playerOne)
         {
-            revert();
+            revert('Player one is not caller');
         }
         if(cntrl % 2 == 1 && msg.sender != playerTwo)
         {
-            revert();
+            revert('Player two is not caller');
         }
         choice[msg.sender] = current_choice;    
         cashPrice += msg.value;
@@ -183,7 +183,7 @@ contract Rpsls
     
     
     function cashIn() public {
-        require(games_won[playerOne] + games_won[playerTwo] == 1);
+        require(cntrl == 20, 'Revert from cashin');
         address payable winner = address(0);
         if(games_won[playerOne] == games_won[playerTwo])
         {
